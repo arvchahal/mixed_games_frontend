@@ -4,7 +4,7 @@ import NavBar from "../app/components/NavBar";
 const meta = {
     component: NavBar,
     args: {
-        src:"../../public/cardlogo.svg"
+        src:"/cardlogo.svg"
     },
 } satisfies Meta<typeof NavBar>;
 

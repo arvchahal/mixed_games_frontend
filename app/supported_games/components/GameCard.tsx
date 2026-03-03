@@ -1,6 +1,5 @@
 "use client";
 import React, { useState } from 'react'
-
 interface GameCardParameters {
     headers: React.ReactNode;
     context: React.ReactNode;

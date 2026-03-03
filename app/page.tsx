@@ -1,11 +1,12 @@
 import Link from "next/link";
 import HomeCard from "./components/HomeCard";
-
+import NavBar from "./components/NavBar";
 export default function Home() {
   return (
     <div className="flex flex-col min-h-screen dark:bg-[#151515]">
-      <main className="flex flex-1 w-full max-w-5xl mx-auto flex-row gap-12 py-24 px-16">
+      <NavBar src="/cardlogo.svg" />
 
+      <main className="flex flex-1 w-full max-w-5xl mx-auto flex-row gap-12 py-24 px-16">
         <div className="flex flex-col gap-8 flex-1">
           <div className="flex flex-col gap-2">
             <h1 className="text-4xl font-bold text-white">Mixed Games</h1>
