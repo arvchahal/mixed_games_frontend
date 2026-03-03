@@ -1,5 +1,7 @@
+'use client'
+
 import React from "react";
-import RoomLayout  from "./components/RoomLayout";
+import RoomLayout  from "../components/RoomLayout";
 import { useState, useEffect } from "react";
 import io from "socket.io-client";
 
