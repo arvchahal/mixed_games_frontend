@@ -3,15 +3,14 @@
 import { useState, useEffect, useRef } from "react";
 import { useParams } from "next/navigation";
 import { io, Socket } from "socket.io-client";
-import RoomLayout from "../components/RoomLayout";
 import SettingsDropdown from "./components/SettingsDropdown";
 import Lobby from "./components/Lobby";
+import GameTable from "./components/GameTable";
 import { DEFAULT_ROOM_SETTINGS, RoomSettings } from "./settings";
+import { GameState, Action } from "./types";
 
 type PageState = "join" | "lobby" | "in_round";
-
 type LobbyPlayer = { id: string; displayName: string; stack: number };
-
 type LobbyUpdate = {
   roomId: string;
   ownerId: string;
@@ -35,6 +34,7 @@ export default function RoomPage() {
   const [pendingPlayers, setPendingPlayers] = useState<LobbyPlayer[]>([]);
   const [settings, setSettings] = useState<RoomSettings>(DEFAULT_ROOM_SETTINGS);
   const [isConnected, setIsConnected] = useState(false);
+  const [gameState, setGameState] = useState<GameState | null>(null);
 
   const socketRef = useRef<Socket | null>(null);
 
@@ -64,10 +64,13 @@ export default function RoomPage() {
       setOwnerId(data.ownerId);
       setPlayers(data.players);
       setPendingPlayers(data.pendingPlayers);
-      setPageState(data.status === "in_round" ? "in_round" : "lobby");
+      if (data.status !== "in_round") setPageState("lobby");
     });
 
-    socket.on("game_state", () => setPageState("in_round"));
+    socket.on("game_state", (data: GameState) => {
+      setGameState(data);
+      setPageState("in_round");
+    });
 
     socket.on("error", ({ message }: { message: string }) => {
       setJoinError(message);
@@ -89,6 +92,11 @@ export default function RoomPage() {
   function handleStartRound() {
     if (!socketRef.current || !playerId) return;
     socketRef.current.emit("start_round", { room_id: roomId, player_id: playerId });
+  }
+
+  function handleAction(action: Action) {
+    if (!socketRef.current || !playerId) return;
+    socketRef.current.emit("player_action", { room_id: roomId, player_id: playerId, action });
   }
 
   function handleSaveSettings(updated: RoomSettings) {
@@ -158,7 +166,9 @@ export default function RoomPage() {
         />
       )}
 
-      {pageState === "in_round" && <RoomLayout />}
+      {pageState === "in_round" && gameState && (
+        <GameTable gameState={gameState} onAction={handleAction} />
+      )}
     </div>
   );
 }
