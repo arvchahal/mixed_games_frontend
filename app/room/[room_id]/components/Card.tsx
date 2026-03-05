@@ -1,6 +1,6 @@
 'use client';
 
-import { Card as CardType } from '../types';
+import { Card as CardType } from '../type';
 
 const RED_SUITS = new Set(['H', 'D', 'hearts', 'diamonds', '♥', '♦']);
 

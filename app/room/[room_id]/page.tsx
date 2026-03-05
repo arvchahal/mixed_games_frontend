@@ -7,7 +7,7 @@ import SettingsDropdown from "./components/SettingsDropdown";
 import Lobby from "./components/Lobby";
 import GameTable from "./components/GameTable";
 import { DEFAULT_ROOM_SETTINGS, RoomSettings } from "./settings";
-import { GameState, Action } from "./types";
+import { GameState, Action } from "./type";
 
 type PageState = "join" | "lobby" | "in_round";
 type LobbyPlayer = { id: string; displayName: string; stack: number };
