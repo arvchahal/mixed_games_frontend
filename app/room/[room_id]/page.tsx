@@ -6,7 +6,7 @@ import { io, Socket } from "socket.io-client";
 import SettingsDropdown from "./components/SettingsDropdown";
 import GameTable from "./components/GameTable";
 import Ledger from "./components/Ledger";
-import Chat from "./components/Chat";
+import Chat, { ChatMessage } from "./components/Chat";
 import { DEFAULT_ROOM_SETTINGS, RoomSettings } from "./settings";
 import { GameState, Action, LedgerEntry } from "./type";
 
@@ -37,13 +37,14 @@ export default function RoomPage() {
   const [isConnected, setIsConnected] = useState(false);
   const [gameState, setGameState] = useState<GameState | null>(null);
   const [ledger, setLedger] = useState<LedgerEntry[]>([]);
+  const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
 
   const socketRef = useRef<Socket | null>(null);
   const pageStateRef = useRef<PageState>("join");
+  const playerIdRef = useRef<string | null>(null);
 
-  useEffect(() => {
-    pageStateRef.current = pageState;
-  }, [pageState]);
+  useEffect(() => { pageStateRef.current = pageState; }, [pageState]);
+  useEffect(() => { playerIdRef.current = playerId; }, [playerId]);
 
   useEffect(() => {
     const socket = io(process.env.NEXT_PUBLIC_SOCKET_URL!);
@@ -78,6 +79,10 @@ export default function RoomPage() {
       setGameState(data);
       setLedger(data.ledger);
       setPageState("in_round");
+    });
+
+    socket.on("chat_message", (msg: ChatMessage) => {
+      setChatMessages((prev) => [...prev, msg]);
     });
 
     socket.on("error", ({ message }: { message: string }) => {
@@ -117,6 +122,11 @@ export default function RoomPage() {
 
   function handleTransferOwnership(targetId: string) {
     socketRef.current?.emit("transfer_ownership", { room_id: roomId, player_id: playerId, target_id: targetId });
+  }
+
+  function handleSendChat(text: string) {
+    if (!socketRef.current || !playerIdRef.current) return;
+    socketRef.current.emit("chat_message", { room_id: roomId, player_id: playerIdRef.current, text });
   }
 
   const isOwner = playerId !== null && playerId === ownerId;
@@ -169,6 +179,7 @@ export default function RoomPage() {
             </button>
           )}
           {ledger.length > 0 && <Ledger ledger={ledger} />}
+          <Chat messages={chatMessages} onSend={handleSendChat} />
           <SettingsDropdown settings={settings} isOwner={isOwner} onSave={handleSaveSettings} />
         </div>
       </div>
@@ -193,23 +204,18 @@ export default function RoomPage() {
               )}
             </div>
           ))}
-          {!isOwner && pageState === "lobby" && (
+          {!isOwner && (
             <span className="ml-auto text-xs text-gray-600">Waiting for host to start…</span>
           )}
         </div>
       )}
 
-      <div className="flex flex-1 min-h-0 overflow-hidden">
-        <Chat socket={socketRef.current} roomId={roomId} playerId={playerId} />
-        <div className="flex-1 min-w-0">
-          <GameTable
-            gameState={gameState}
-            lobbyPlayers={players}
-            myId={playerId}
-            onAction={handleAction}
-          />
-        </div>
-      </div>
+      <GameTable
+        gameState={gameState}
+        lobbyPlayers={players}
+        myId={playerId}
+        onAction={handleAction}
+      />
     </div>
   );
 }
