@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect } from 'react';
 
-export type ChatMessage = { displayName: string; text: string };
+export type ChatMessage = { displayName: string; text: string; sentAt: number };
 
 interface ChatProps {
   messages: ChatMessage[];
@@ -57,8 +57,8 @@ export default function Chat({ messages, onSend }: ChatProps) {
             {messages.length === 0 && (
               <p className="text-xs text-gray-600 text-center mt-4">No messages yet</p>
             )}
-            {messages.map((m, i) => (
-              <div key={i} className="text-sm break-words">
+            {messages.map((m) => (
+              <div key={`${m.sentAt}-${m.displayName}-${m.text}`} className="text-sm break-words">
                 <span className="text-gray-400 font-medium">{m.displayName}: </span>
                 <span className="text-gray-300">{m.text}</span>
               </div>

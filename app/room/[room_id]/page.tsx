@@ -20,6 +20,7 @@ type LobbyUpdate = {
   players: LobbyPlayer[];
   pendingPlayers: LobbyPlayer[];
   ledger: LedgerEntry[];
+  chatMessages: ChatMessage[];
 };
 
 export default function RoomPage() {
@@ -69,6 +70,7 @@ export default function RoomPage() {
       setOwnerId(data.ownerId);
       setPlayers(data.players);
       setLedger(data.ledger);
+      setChatMessages(data.chatMessages ?? []);
       if (data.settings) setSettings(data.settings);
       if (data.status !== "in_round") setPageState("lobby");
     });
@@ -76,6 +78,7 @@ export default function RoomPage() {
     socket.on("game_state", (data: GameState) => {
       setGameState(data);
       setLedger(data.ledger);
+      setChatMessages(data.chatMessages ?? []);
       setPageState("in_round");
     });
 

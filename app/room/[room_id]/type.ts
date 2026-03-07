@@ -36,6 +36,11 @@ export type GameState = {
   myId: string;
   myStack: number;
   ledger: LedgerEntry[];
+  chatMessages: {
+    displayName: string;
+    text: string;
+    sentAt: number;
+  }[];
 };
 
 export type Action =
