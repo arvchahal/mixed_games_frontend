@@ -29,6 +29,9 @@ export default function OptionButtons({ isMyTurn, currentBet, callAmount, myStac
     return () => clearInterval(interval);
   }, [isMyTurn]);
 
+  // owesChips: player must call or fold. False when no bet, or when they've already matched (BB option).
+  const owesChips = callAmount > 0;
+  // hasBet: determines Raise vs Bet label on the size input.
   const hasBet = currentBet > 0;
 
   function submitBetOrRaise() {
@@ -62,65 +65,46 @@ export default function OptionButtons({ isMyTurn, currentBet, callAmount, myStac
         </div>
       )}
       <div className="flex items-center gap-2">
-        {hasBet ? (
-          <>
-            <button
-              onClick={() => onAction({ type: 'fold' })}
-              className="px-4 py-2 rounded bg-red-700 text-white text-sm font-medium hover:bg-red-600"
-            >
-              Fold
-            </button>
-            <button
-              onClick={() => onAction({ type: 'call' })}
-              className="px-4 py-2 rounded bg-blue-700 text-white text-sm font-medium hover:bg-blue-600"
-            >
-              Call {callAmount}
-            </button>
-            <div className="flex items-center gap-1">
-              <input
-                type="number"
-                min={minRaise}
-                max={myStack}
-                value={amount || ''}
-                onChange={(e) => setAmount(Number(e.target.value))}
-                placeholder={`min ${minRaise}`}
-                className="w-24 px-2 py-2 text-sm rounded bg-gray-800 border border-gray-600 text-white"
-              />
-              <button
-                onClick={submitBetOrRaise}
-                className="px-4 py-2 rounded bg-yellow-600 text-white text-sm font-medium hover:bg-yellow-500"
-              >
-                Raise
-              </button>
-            </div>
-          </>
-        ) : (
-          <>
-            <button
-              onClick={() => onAction({ type: 'check' })}
-              className="px-4 py-2 rounded bg-gray-600 text-white text-sm font-medium hover:bg-gray-500"
-            >
-              Check
-            </button>
-            <div className="flex items-center gap-1">
-              <input
-                type="number"
-                min={1}
-                max={myStack}
-                value={amount || ''}
-                onChange={(e) => setAmount(Number(e.target.value))}
-                placeholder="amount"
-                className="w-24 px-2 py-2 text-sm rounded bg-gray-800 border border-gray-600 text-white"
-              />
-              <button
-                onClick={submitBetOrRaise}
-                className="px-4 py-2 rounded bg-yellow-600 text-white text-sm font-medium hover:bg-yellow-500"
-              >
-                Bet
-              </button>
-            </div>
-          </>
+        {owesChips && (
+          <button
+            onClick={() => onAction({ type: 'fold' })}
+            className="px-4 py-2 rounded bg-red-700 text-white text-sm font-medium hover:bg-red-600"
+          >
+            Fold
+          </button>
         )}
+        {owesChips ? (
+          <button
+            onClick={() => onAction({ type: 'call' })}
+            className="px-4 py-2 rounded bg-blue-700 text-white text-sm font-medium hover:bg-blue-600"
+          >
+            Call {callAmount}
+          </button>
+        ) : (
+          <button
+            onClick={() => onAction({ type: 'check' })}
+            className="px-4 py-2 rounded bg-gray-600 text-white text-sm font-medium hover:bg-gray-500"
+          >
+            Check
+          </button>
+        )}
+        <div className="flex items-center gap-1">
+          <input
+            type="number"
+            min={hasBet ? minRaise : 1}
+            max={hasBet ? maxRaise : myStack}
+            value={amount || ''}
+            onChange={(e) => setAmount(Number(e.target.value))}
+            placeholder={hasBet ? `min ${minRaise}` : 'amount'}
+            className="w-24 px-2 py-2 text-sm rounded bg-gray-800 border border-gray-600 text-white"
+          />
+          <button
+            onClick={submitBetOrRaise}
+            className="px-4 py-2 rounded bg-yellow-600 text-white text-sm font-medium hover:bg-yellow-500"
+          >
+            {hasBet ? 'Raise' : 'Bet'}
+          </button>
+        </div>
       </div>
     </div>
   );
