@@ -13,6 +13,11 @@ export const Primary: Story = {
     gameState: {
       myId: "player-1",
       myStack: 500,
+      ledger: [
+        { displayName: "You", totalBuyIn: 500, stack: 450, delta: 75 },
+        { displayName: "Alice", totalBuyIn: 500, stack: 300, delta: -140 },
+        { displayName: "Bob", totalBuyIn: 500, stack: 200, delta: 65 },
+      ],
       hand: {
         pot: 150,
         currentBet: 50,
@@ -29,6 +34,8 @@ export const Primary: Story = {
         },
       },
     },
+    lobbyPlayers: [],
+    myId: "player-1",
     onAction: () => {},
   },
 };

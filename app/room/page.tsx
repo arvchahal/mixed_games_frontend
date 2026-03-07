@@ -40,7 +40,7 @@ export default function NewRoom() {
     });
 
     socket.once("connect", () => {
-      socket.emit("create_room", { display_name: trimmed, game_type: "indianPoker", settings: {}, stack });
+      socket.emit("create_room", { display_name: trimmed, game_type: "indianPoker", settings: { stake: 100, smallBlind: 0.5, bigBlind: 1 }, stack });
     });
   }
 

@@ -24,10 +24,18 @@ export type HandView = {
   minRaise: number;
 };
 
+export type LedgerEntry = {
+  displayName: string;
+  totalBuyIn: number;
+  stack: number;
+  delta: number;
+};
+
 export type GameState = {
   hand: HandView;
   myId: string;
   myStack: number;
+  ledger: LedgerEntry[];
 };
 
 export type Action =

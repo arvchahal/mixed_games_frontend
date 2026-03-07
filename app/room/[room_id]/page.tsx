@@ -4,19 +4,20 @@ import { useState, useEffect, useRef } from "react";
 import { useParams } from "next/navigation";
 import { io, Socket } from "socket.io-client";
 import SettingsDropdown from "./components/SettingsDropdown";
-import Lobby from "./components/Lobby";
 import GameTable from "./components/GameTable";
+import Ledger from "./components/Ledger";
 import { DEFAULT_ROOM_SETTINGS, RoomSettings } from "./settings";
-import { GameState, Action } from "./type";
+import { GameState, Action, LedgerEntry } from "./type";
 
 type PageState = "join" | "lobby" | "in_round";
-type LobbyPlayer = { id: string; displayName: string; stack: number };
+type LobbyPlayer = { id: string; displayName: string; stack: number; seatIndex: number };
 type LobbyUpdate = {
   roomId: string;
   ownerId: string;
   status: "lobby" | "in_round";
   players: LobbyPlayer[];
   pendingPlayers: LobbyPlayer[];
+  ledger: LedgerEntry[];
 };
 
 export default function RoomPage() {
@@ -24,19 +25,23 @@ export default function RoomPage() {
 
   const [pageState, setPageState] = useState<PageState>("join");
   const [joinName, setJoinName] = useState("");
-  const [joinStack, setJoinStack] = useState(100);
   const [joinError, setJoinError] = useState("");
   const [joining, setJoining] = useState(false);
 
   const [playerId, setPlayerId] = useState<string | null>(null);
   const [ownerId, setOwnerId] = useState<string | null>(null);
   const [players, setPlayers] = useState<LobbyPlayer[]>([]);
-  const [pendingPlayers, setPendingPlayers] = useState<LobbyPlayer[]>([]);
   const [settings, setSettings] = useState<RoomSettings>(DEFAULT_ROOM_SETTINGS);
   const [isConnected, setIsConnected] = useState(false);
   const [gameState, setGameState] = useState<GameState | null>(null);
+  const [ledger, setLedger] = useState<LedgerEntry[]>([]);
 
   const socketRef = useRef<Socket | null>(null);
+  const pageStateRef = useRef<PageState>("join");
+
+  useEffect(() => {
+    pageStateRef.current = pageState;
+  }, [pageState]);
 
   useEffect(() => {
     const socket = io(process.env.NEXT_PUBLIC_SOCKET_URL!);
@@ -45,10 +50,9 @@ export default function RoomPage() {
     socket.on("connect", () => {
       setIsConnected(true);
       const savedId = localStorage.getItem(`pid_${roomId}`);
-      const savedStack = Number(localStorage.getItem(`stack_${roomId}`)) || 100;
       if (savedId) {
         setPlayerId(savedId);
-        socket.emit("join_room", { room_id: roomId, player_id: savedId, display_name: "", stack: savedStack });
+        socket.emit("join_room", { room_id: roomId, player_id: savedId, display_name: "" });
       }
     });
 
@@ -63,18 +67,23 @@ export default function RoomPage() {
     socket.on("lobby_update", (data: LobbyUpdate) => {
       setOwnerId(data.ownerId);
       setPlayers(data.players);
-      setPendingPlayers(data.pendingPlayers);
+      setLedger(data.ledger);
       if (data.status !== "in_round") setPageState("lobby");
     });
 
     socket.on("game_state", (data: GameState) => {
       setGameState(data);
+      setLedger(data.ledger);
       setPageState("in_round");
     });
 
     socket.on("error", ({ message }: { message: string }) => {
       setJoinError(message);
       setJoining(false);
+      if (pageStateRef.current === "join") {
+        setPlayerId(null);
+        localStorage.removeItem(`pid_${roomId}`);
+      }
     });
 
     return () => { socket.disconnect(); };
@@ -82,11 +91,10 @@ export default function RoomPage() {
 
   function handleJoin() {
     const trimmed = joinName.trim();
-    if (!trimmed || joinStack <= 0 || !socketRef.current) return;
+    if (!trimmed || !socketRef.current) return;
     setJoining(true);
     setJoinError("");
-    localStorage.setItem(`stack_${roomId}`, String(joinStack));
-    socketRef.current.emit("join_room", { room_id: roomId, display_name: trimmed, stack: joinStack });
+    socketRef.current.emit("join_room", { room_id: roomId, display_name: trimmed });
   }
 
   function handleStartRound() {
@@ -107,7 +115,7 @@ export default function RoomPage() {
   const isOwner = playerId !== null && playerId === ownerId;
 
   if (pageState === "join" && !playerId) {
-    const canJoin = joinName.trim().length > 0 && joinStack > 0 && !joining;
+    const canJoin = joinName.trim().length > 0 && !joining;
     return (
       <div className="flex flex-col min-h-screen bg-[#151515] items-center justify-center">
         <div className="flex flex-col gap-4 w-72">
@@ -123,17 +131,6 @@ export default function RoomPage() {
             className="px-3 py-2 rounded-lg bg-[#1e1e1e] border border-gray-700 text-white placeholder-gray-600 focus:outline-none focus:border-violet-500 disabled:opacity-40 transition-colors"
             autoFocus
           />
-          <div className="flex flex-col gap-1">
-            <label className="text-xs text-gray-500">Starting stack</label>
-            <input
-              type="number"
-              min={1}
-              value={joinStack}
-              disabled={joining}
-              onChange={(e) => setJoinStack(Number(e.target.value))}
-              className="px-3 py-2 rounded-lg bg-[#1e1e1e] border border-gray-700 text-white focus:outline-none focus:border-violet-500 disabled:opacity-40 transition-colors"
-            />
-          </div>
           {joinError && <p className="text-red-400 text-sm">{joinError}</p>}
           <button
             onClick={handleJoin}
@@ -154,21 +151,27 @@ export default function RoomPage() {
           <span className={`w-2 h-2 rounded-full ${isConnected ? "bg-green-500" : "bg-gray-600"}`} />
           <span className="text-xs text-gray-500 font-mono">{roomId}</span>
         </div>
-        <SettingsDropdown settings={settings} isOwner={isOwner} onSave={handleSaveSettings} />
+        <div className="flex items-center gap-3">
+          {pageState === "lobby" && isOwner && (
+            <button
+              onClick={handleStartRound}
+              disabled={players.length < 2}
+              className="px-4 py-1.5 rounded-lg bg-violet-600 hover:bg-violet-500 disabled:opacity-40 disabled:cursor-not-allowed text-white text-sm font-medium transition-colors"
+            >
+              Start Round
+            </button>
+          )}
+          {ledger.length > 0 && <Ledger ledger={ledger} />}
+          <SettingsDropdown settings={settings} isOwner={isOwner} onSave={handleSaveSettings} />
+        </div>
       </div>
 
-      {pageState === "lobby" && (
-        <Lobby
-          players={players}
-          pendingPlayers={pendingPlayers}
-          isOwner={isOwner}
-          onStartRound={handleStartRound}
-        />
-      )}
-
-      {pageState === "in_round" && gameState && (
-        <GameTable gameState={gameState} onAction={handleAction} />
-      )}
+      <GameTable
+        gameState={gameState}
+        lobbyPlayers={players}
+        myId={playerId}
+        onAction={handleAction}
+      />
     </div>
   );
 }
