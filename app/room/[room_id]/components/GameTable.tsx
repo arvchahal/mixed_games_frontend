@@ -78,10 +78,11 @@ export default function GameTable({ gameState, lobbyPlayers, myId, onAction }: G
         return (
           <div
             key={`bet-${i}`}
-            className="absolute -translate-x-1/2 -translate-y-1/2 rounded-lg border-2 border-indigo-500 bg-[#1e1e2e] text-gray-200 text-xs font-bold px-2 py-1 shadow-md"
+            className="absolute -translate-x-1/2 -translate-y-1/2 min-w-16 rounded-xl border border-indigo-200/25 bg-gradient-to-b from-indigo-500 to-indigo-700 px-3 py-2 text-center text-white shadow-[0_10px_30px_rgba(79,70,229,0.45)] ring-2 ring-indigo-300/15"
             style={{ left: `${(pos.x / SVG_W) * 100}%`, top: `${(pos.y / SVG_H) * 100}%` }}
           >
-            {player.currentBetAmount}
+            <div className="text-[9px] font-semibold uppercase tracking-[0.22em] text-indigo-100/80">Bet</div>
+            <div className="text-sm font-black leading-none tabular-nums">{player.currentBetAmount}</div>
           </div>
         );
       })}
