@@ -1,6 +1,7 @@
 import Link from "next/link";
 import HomeCard from "./components/HomeCard";
 import NavBar from "./components/NavBar";
+
 export default function Home() {
   return (
     <div className="flex flex-col min-h-screen dark:bg-[#151515]">
@@ -19,6 +20,11 @@ export default function Home() {
             <Link href="/room">
               <div className="p-3 rounded-lg border-2 border-violet-500 w-56 flex justify-center bg-violet-700 text-white cursor-pointer hover:bg-violet-600 text-base font-medium">
                 Start a new game
+              </div>
+            </Link>
+            <Link href="/join">
+              <div className="p-3 rounded-lg border-2 border-gray-600 w-56 flex justify-center text-gray-300 cursor-pointer hover:bg-gray-800 text-base transition-colors">
+                Join a game
               </div>
             </Link>
             <Link href="/supported_games">
@@ -52,10 +58,14 @@ export default function Home() {
           </p>
         </div>
 
-        <div className="flex flex-col flex-1 justify-start pt-2">
+        <div className="flex flex-col flex-1 justify-start pt-2 gap-0">
           <HomeCard
             header="Indian Poker"
             context="Each player holds one card to their forehead, visible to everyone but themselves. Bet, bluff, and read the table. No-limit betting with full chip tracking across rounds."
+          />
+          <HomeCard
+            header="Screw Your Neighbor — coming soon"
+            context="Players try to avoid holding the lowest card at the table. Trade or block — but the dealer always has the deck. Fast, chaotic, and brutal on the last chip."
           />
         </div>
       </main>
