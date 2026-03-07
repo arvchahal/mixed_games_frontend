@@ -6,6 +6,7 @@ import { io, Socket } from "socket.io-client";
 import SettingsDropdown from "./components/SettingsDropdown";
 import GameTable from "./components/GameTable";
 import Ledger from "./components/Ledger";
+import Chat from "./components/Chat";
 import { DEFAULT_ROOM_SETTINGS, RoomSettings } from "./settings";
 import { GameState, Action, LedgerEntry } from "./type";
 
@@ -151,7 +152,7 @@ export default function RoomPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#151515] text-white flex flex-col">
+    <div className="h-screen bg-[#151515] text-white flex flex-col overflow-hidden">
       <div className="flex items-center justify-between px-6 py-3 border-b border-gray-800">
         <div className="flex items-center gap-3">
           <span className={`w-2 h-2 rounded-full ${isConnected ? "bg-green-500" : "bg-gray-600"}`} />
@@ -198,12 +199,17 @@ export default function RoomPage() {
         </div>
       )}
 
-      <GameTable
-        gameState={gameState}
-        lobbyPlayers={players}
-        myId={playerId}
-        onAction={handleAction}
-      />
+      <div className="flex flex-1 min-h-0 overflow-hidden">
+        <Chat socket={socketRef.current} roomId={roomId} playerId={playerId} />
+        <div className="flex-1 min-w-0">
+          <GameTable
+            gameState={gameState}
+            lobbyPlayers={players}
+            myId={playerId}
+            onAction={handleAction}
+          />
+        </div>
+      </div>
     </div>
   );
 }
