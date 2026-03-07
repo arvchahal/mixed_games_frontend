@@ -29,7 +29,7 @@ const BET_POSITIONS = SEAT_POSITIONS.map(({ x, y }) => ({
 const SVG_W = 1600;
 const SVG_H = 1080;
 
-type LobbyPlayer = { id: string; displayName: string; stack: number; seatIndex: number };
+type LobbyPlayer = { id: string; displayName: string; stack: number; seatIndex: number; connected?: boolean };
 
 interface GameTableProps {
   gameState: GameState | null;
@@ -105,6 +105,7 @@ export default function GameTable({ gameState, lobbyPlayers, myId, onAction }: G
               isButton={player?.id === buttonPlayerId}
               isCurrentTurn={hand ? hand.playerOrder[hand.currentPlayerIndex] === player?.id && !hand.isOver : false}
               handActive={!!hand && !hand.isOver}
+              connected={(player as LobbyPlayer | undefined)?.connected}
             />
             {player && hand && <Card card={(player as PlayerView).card ?? null}/>}
           </div>

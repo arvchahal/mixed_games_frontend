@@ -6,9 +6,10 @@ interface SeatProps {
   isButton?: boolean;
   isCurrentTurn?: boolean;
   handActive?: boolean; // true when a hand is in progress
+  connected?: boolean;  // undefined = in-round (unknown), false = disconnected
 }
 
-export default function Seat({ player, isMe, isButton, isCurrentTurn, handActive }: SeatProps) {
+export default function Seat({ player, isMe, isButton, isCurrentTurn, handActive, connected }: SeatProps) {
   if (player) {
     // Dim players who are not the current turn during an active hand
     const dimmed = handActive && !isCurrentTurn;
@@ -34,6 +35,12 @@ export default function Seat({ player, isMe, isButton, isCurrentTurn, handActive
             <div className="absolute bottom-0 right-0 w-6 h-6 rounded-full bg-yellow-400 text-black text-xs font-bold flex items-center justify-center">
               D
             </div>
+          )}
+          {connected === false && (
+            <div className="absolute top-0 left-0 w-4 h-4 rounded-full bg-gray-500 border-2 border-[#151515]" title="Disconnected" />
+          )}
+          {connected === true && (
+            <div className="absolute top-0 left-0 w-4 h-4 rounded-full bg-green-500 border-2 border-[#151515]" title="Connected" />
           )}
         </div>
       </div>

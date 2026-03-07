@@ -10,7 +10,7 @@ import { DEFAULT_ROOM_SETTINGS, RoomSettings } from "./settings";
 import { GameState, Action, LedgerEntry } from "./type";
 
 type PageState = "join" | "lobby" | "in_round";
-type LobbyPlayer = { id: string; displayName: string; stack: number; seatIndex: number };
+type LobbyPlayer = { id: string; displayName: string; stack: number; seatIndex: number; connected?: boolean };
 type LobbyUpdate = {
   roomId: string;
   ownerId: string;
@@ -114,6 +114,10 @@ export default function RoomPage() {
     socketRef.current?.emit("update_settings", { room_id: roomId, player_id: playerId, settings: updated });
   }
 
+  function handleTransferOwnership(targetId: string) {
+    socketRef.current?.emit("transfer_ownership", { room_id: roomId, player_id: playerId, target_id: targetId });
+  }
+
   const isOwner = playerId !== null && playerId === ownerId;
 
   if (pageState === "join" && !playerId) {
@@ -167,6 +171,32 @@ export default function RoomPage() {
           <SettingsDropdown settings={settings} isOwner={isOwner} onSave={handleSaveSettings} />
         </div>
       </div>
+
+      {pageState === "lobby" && (
+        <div className="px-6 py-3 border-b border-gray-800 flex items-center gap-3 flex-wrap">
+          {players.map((p) => (
+            <div key={p.id} className="flex items-center gap-1.5">
+              <span className={`w-2 h-2 rounded-full flex-shrink-0 ${p.connected === false ? 'bg-gray-500' : 'bg-green-500'}`} />
+              <span className={`text-sm ${p.id === playerId ? 'text-white font-medium' : 'text-gray-400'}`}>
+                {p.displayName}
+                {p.id === ownerId && <span className="ml-1 text-yellow-400 text-xs">♛</span>}
+              </span>
+              {isOwner && p.id !== playerId && (
+                <button
+                  onClick={() => handleTransferOwnership(p.id)}
+                  className="text-[10px] text-gray-600 hover:text-gray-300 px-1 transition-colors"
+                  title="Transfer ownership"
+                >
+                  make host
+                </button>
+              )}
+            </div>
+          ))}
+          {!isOwner && pageState === "lobby" && (
+            <span className="ml-auto text-xs text-gray-600">Waiting for host to start…</span>
+          )}
+        </div>
+      )}
 
       <GameTable
         gameState={gameState}
