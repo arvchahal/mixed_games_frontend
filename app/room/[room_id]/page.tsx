@@ -41,10 +41,8 @@ export default function RoomPage() {
 
   const socketRef = useRef<Socket | null>(null);
   const pageStateRef = useRef<PageState>("join");
-  const playerIdRef = useRef<string | null>(null);
 
   useEffect(() => { pageStateRef.current = pageState; }, [pageState]);
-  useEffect(() => { playerIdRef.current = playerId; }, [playerId]);
 
   useEffect(() => {
     const socket = io(process.env.NEXT_PUBLIC_SOCKET_URL!);
@@ -125,8 +123,8 @@ export default function RoomPage() {
   }
 
   function handleSendChat(text: string) {
-    if (!socketRef.current || !playerIdRef.current) return;
-    socketRef.current.emit("chat_message", { room_id: roomId, player_id: playerIdRef.current, text });
+    if (!socketRef.current || !playerId) return;
+    socketRef.current.emit("chat_message", { room_id: roomId, player_id: playerId, text });
   }
 
   const isOwner = playerId !== null && playerId === ownerId;
@@ -162,7 +160,7 @@ export default function RoomPage() {
   }
 
   return (
-    <div className="h-screen bg-[#151515] text-white flex flex-col overflow-hidden">
+    <div className="min-h-screen bg-[#151515] text-white flex flex-col">
       <div className="flex items-center justify-between px-6 py-3 border-b border-gray-800">
         <div className="flex items-center gap-3">
           <span className={`w-2 h-2 rounded-full ${isConnected ? "bg-green-500" : "bg-gray-600"}`} />
