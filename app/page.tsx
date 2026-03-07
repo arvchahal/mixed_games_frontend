@@ -64,8 +64,8 @@ export default function Home() {
             context="Each player holds one card to their forehead, visible to everyone but themselves. Bet, bluff, and read the table. No-limit betting with full chip tracking across rounds."
           />
           <HomeCard
-            header="Screw Your Neighbor — coming soon"
-            context="Players try to avoid holding the lowest card at the table. Trade or block — but the dealer always has the deck. Fast, chaotic, and brutal on the last chip."
+            header="PLO and Hold'em flips"
+            context="Simple PLO and hold'em flips for a predetermined stakes and sizings"
           />
         </div>
       </main>
