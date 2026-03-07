@@ -15,6 +15,7 @@ type LobbyUpdate = {
   roomId: string;
   ownerId: string;
   status: "lobby" | "in_round";
+  settings?: RoomSettings;
   players: LobbyPlayer[];
   pendingPlayers: LobbyPlayer[];
   ledger: LedgerEntry[];
@@ -68,6 +69,7 @@ export default function RoomPage() {
       setOwnerId(data.ownerId);
       setPlayers(data.players);
       setLedger(data.ledger);
+      if (data.settings) setSettings(data.settings);
       if (data.status !== "in_round") setPageState("lobby");
     });
 
