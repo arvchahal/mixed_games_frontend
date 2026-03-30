@@ -13,6 +13,7 @@ export const Primary: Story = {
     gameState: {
       myId: "player-1",
       myStack: 500,
+      handsRemaining: 10,
       chatMessages: [],
       ledger: [
         { displayName: "You", totalBuyIn: 500, stack: 450, delta: 75 },

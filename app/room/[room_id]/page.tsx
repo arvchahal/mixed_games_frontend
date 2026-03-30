@@ -19,6 +19,7 @@ type LobbyUpdate = {
   settings?: RoomSettings;
   players: LobbyPlayer[];
   pendingPlayers: LobbyPlayer[];
+  spectators: LobbyPlayer[];
   ledger: LedgerEntry[];
   chatMessages: ChatMessage[];
 };
@@ -34,6 +35,7 @@ export default function RoomPage() {
   const [playerId, setPlayerId] = useState<string | null>(null);
   const [ownerId, setOwnerId] = useState<string | null>(null);
   const [players, setPlayers] = useState<LobbyPlayer[]>([]);
+  const [spectators, setSpectators] = useState<LobbyPlayer[]>([]);
   const [settings, setSettings] = useState<RoomSettings>(DEFAULT_ROOM_SETTINGS);
   const [isConnected, setIsConnected] = useState(false);
   const [gameState, setGameState] = useState<GameState | null>(null);
@@ -77,6 +79,7 @@ export default function RoomPage() {
     socket.on("lobby_update", (data: LobbyUpdate) => {
       setOwnerId(data.ownerId);
       setPlayers(data.players);
+      setSpectators(data.spectators ?? []);
       setLedger(data.ledger);
       setChatMessages(data.chatMessages ?? []);
       if (data.settings) setSettings(data.settings);
@@ -114,6 +117,14 @@ export default function RoomPage() {
     setJoining(true);
     setJoinError("");
     socketRef.current.emit("join_room", { room_id: roomId, display_name: trimmed });
+  }
+
+  function handleWatch() {
+    const trimmed = joinName.trim();
+    if (!trimmed || !socketRef.current) return;
+    setJoining(true);
+    setJoinError("");
+    socketRef.current.emit("join_room", { room_id: roomId, display_name: trimmed, spectator: true });
   }
 
   function handleStartRound() {
@@ -170,6 +181,13 @@ export default function RoomPage() {
           >
             {joining ? "Joining..." : "Take a Seat"}
           </button>
+          <button
+            onClick={handleWatch}
+            disabled={!canJoin}
+            className="py-2 rounded-lg bg-transparent border border-gray-600 hover:border-gray-400 disabled:opacity-40 disabled:cursor-not-allowed text-gray-400 hover:text-white font-medium transition-colors"
+          >
+            Watch
+          </button>
         </div>
       </div>
     );
@@ -181,6 +199,9 @@ export default function RoomPage() {
         <div className="flex items-center gap-3">
           <span className={`w-2 h-2 rounded-full ${isConnected ? "bg-green-500" : "bg-gray-600"}`} />
           <span className="text-xs text-gray-500 font-mono">{roomId}</span>
+          {pageState === "in_round" && gameState && (
+            <span className="text-xs text-gray-500">{gameState.handsRemaining} hands left</span>
+          )}
         </div>
         <div className="flex items-center gap-3">
           {pageState === "lobby" && isOwner && (
@@ -217,6 +238,11 @@ export default function RoomPage() {
               )}
             </div>
           ))}
+          {spectators.length > 0 && (
+            <span className="ml-2 text-xs text-gray-600">
+              watching: {spectators.map((s) => s.displayName).join(", ")}
+            </span>
+          )}
           {!isOwner && (
             <span className="ml-auto text-xs text-gray-600">Waiting for host to start…</span>
           )}

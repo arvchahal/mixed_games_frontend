@@ -35,6 +35,7 @@ export type GameState = {
   hand: HandView;
   myId: string;
   myStack: number;
+  handsRemaining: number;
   ledger: LedgerEntry[];
   chatMessages: {
     displayName: string;
