@@ -78,12 +78,18 @@ interface SettingsDropdownProps {
           </div>
 
             <div className="p-4 flex flex-col gap-4">
-              <label className="flex items-center justify-between gap-4 cursor-pointer">
-                <input
-                  type="checkbox"
-                  className="w-4 h-4 accent-amber-400 cursor-pointer"
-                />
-              </label>
+              <div className="flex items-center justify-between gap-4">
+                <button
+                  type="button"
+                  className={`relative w-10 h-6 rounded-full transition-colors focus:outline-none ${
+                  }`}
+                >
+                  <span
+                    className={`absolute top-1 w-4 h-4 rounded-full bg-white shadow transition-transform ${
+                    }`}
+                  />
+                </button>
+              </div>
             </div>
           )}
 
