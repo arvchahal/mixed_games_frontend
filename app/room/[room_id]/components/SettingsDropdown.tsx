@@ -51,7 +51,7 @@ interface SettingsDropdownProps {
       </button>
 
       {open && (
-        <div className="absolute right-0 mt-2 w-80 rounded-xl border border-gray-700 bg-[#1a1a1a] shadow-2xl z-50 overflow-hidden">
+        <div className="absolute right-0 mt-2 w-80 rounded-xl border border-gray-700 bg-[#1a1a1a] shadow-2xl z-[9999] overflow-hidden">
           {/* Tabs */}
           <div className="flex border-b border-gray-700">
             <button
