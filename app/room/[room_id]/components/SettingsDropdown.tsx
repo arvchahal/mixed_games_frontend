@@ -3,7 +3,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { RoomSettings } from '../settings';
 
-type SettingsTab = 'game';
+type SettingsTab = 'game' | 'dev';
 
 interface SettingsDropdownProps {
   settings: RoomSettings;
@@ -11,7 +11,6 @@ interface SettingsDropdownProps {
   onSave?: (updated: RoomSettings) => void;
 }
 
-export default function SettingsDropdown({ settings, isOwner, onSave }: SettingsDropdownProps) {
   const [open, setOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<SettingsTab>('game');
   const [draft, setDraft] = useState<RoomSettings>(settings);
@@ -65,7 +64,28 @@ export default function SettingsDropdown({ settings, isOwner, onSave }: Settings
             >
               Game Config
             </button>
+              <button
+                onClick={() => setActiveTab('dev')}
+                className={`flex-1 px-4 py-2.5 text-sm font-medium transition-colors ${
+                  activeTab === 'dev'
+                    ? 'text-amber-400 border-b-2 border-amber-400 bg-[#1e1e1e]'
+                    : 'text-gray-500 hover:text-gray-300'
+                }`}
+              >
+                Dev
+              </button>
+            )}
           </div>
+
+            <div className="p-4 flex flex-col gap-4">
+              <label className="flex items-center justify-between gap-4 cursor-pointer">
+                <input
+                  type="checkbox"
+                  className="w-4 h-4 accent-amber-400 cursor-pointer"
+                />
+              </label>
+            </div>
+          )}
 
           {/* Game Config Tab */}
           {activeTab === 'game' && (

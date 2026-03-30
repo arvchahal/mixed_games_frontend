@@ -45,6 +45,14 @@ export default function RoomPage() {
 
   useEffect(() => { pageStateRef.current = pageState; }, [pageState]);
 
+  // Detect ?dev=<key> query param to enable dev mode
+  useEffect(() => {
+    const key = new URLSearchParams(window.location.search).get("dev");
+    if (key) {
+      setDevMode(true);
+    }
+  }, []);
+
   useEffect(() => {
     const socket = io(process.env.NEXT_PUBLIC_SOCKET_URL!);
     socketRef.current = socket;
@@ -86,6 +94,8 @@ export default function RoomPage() {
       setChatMessages((prev) => [...prev, msg]);
     });
 
+    });
+
     socket.on("error", ({ message }: { message: string }) => {
       setJoinError(message);
       setJoining(false);
@@ -123,6 +133,9 @@ export default function RoomPage() {
 
   function handleTransferOwnership(targetId: string) {
     socketRef.current?.emit("transfer_ownership", { room_id: roomId, player_id: playerId, target_id: targetId });
+  }
+
+    if (!socketRef.current || !playerId) return;
   }
 
   function handleSendChat(text: string) {
@@ -181,7 +194,6 @@ export default function RoomPage() {
           )}
           {ledger.length > 0 && <Ledger ledger={ledger} />}
           <Chat messages={chatMessages} onSend={handleSendChat} />
-          <SettingsDropdown settings={settings} isOwner={isOwner} onSave={handleSaveSettings} />
         </div>
       </div>
 
