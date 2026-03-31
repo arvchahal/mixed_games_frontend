@@ -58,10 +58,17 @@ export default function Chat({ messages, onSend }: ChatProps) {
               <p className="text-xs text-gray-600 text-center mt-4">No messages yet</p>
             )}
             {messages.map((m) => (
-              <div key={`${m.sentAt}-${m.displayName}-${m.text}`} className="text-sm break-words">
-                <span className="text-gray-400 font-medium">{m.displayName}: </span>
-                <span className="text-gray-300">{m.text}</span>
-              </div>
+              m.displayName === "Game"
+                ? (
+                  <div key={`${m.sentAt}-${m.displayName}-${m.text}`} className="text-xs text-indigo-300/80 italic break-words py-0.5">
+                    {m.text}
+                  </div>
+                ) : (
+                  <div key={`${m.sentAt}-${m.displayName}-${m.text}`} className="text-sm break-words">
+                    <span className="text-gray-400 font-medium">{m.displayName}: </span>
+                    <span className="text-gray-300">{m.text}</span>
+                  </div>
+                )
             ))}
             <div ref={bottomRef} />
           </div>

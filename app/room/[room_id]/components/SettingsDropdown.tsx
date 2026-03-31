@@ -3,16 +3,14 @@
 import { useState, useRef, useEffect } from 'react';
 import { RoomSettings } from '../settings';
 
-type SettingsTab = 'game' | 'dev';
-
 interface SettingsDropdownProps {
   settings: RoomSettings;
   isOwner: boolean;
   onSave?: (updated: RoomSettings) => void;
 }
 
+export default function SettingsDropdown({ settings, isOwner, onSave }: SettingsDropdownProps) {
   const [open, setOpen] = useState(false);
-  const [activeTab, setActiveTab] = useState<SettingsTab>('game');
   const [draft, setDraft] = useState<RoomSettings>(settings);
   const ref = useRef<HTMLDivElement>(null);
 
@@ -52,83 +50,39 @@ interface SettingsDropdownProps {
 
       {open && (
         <div className="absolute right-0 mt-2 w-80 rounded-xl border border-gray-700 bg-[#1a1a1a] shadow-2xl z-[9999] overflow-hidden">
-          {/* Tabs */}
-          <div className="flex border-b border-gray-700">
-            <button
-              onClick={() => setActiveTab('game')}
-              className={`flex-1 px-4 py-2.5 text-sm font-medium transition-colors ${
-                activeTab === 'game'
-                  ? 'text-white border-b-2 border-violet-500 bg-[#1e1e1e]'
-                  : 'text-gray-500 hover:text-gray-300'
-              }`}
-            >
-              Game Config
-            </button>
+          <div className="p-4 flex flex-col gap-4">
+            <SettingRow
+              label="Stake (buy-in)"
+              value={draft.stake}
+              disabled={!isOwner}
+              onChange={(v) => setDraft((d) => ({ ...d, stake: v }))}
+            />
+            <SettingRow
+              label="Small Blind"
+              value={draft.smallBlind}
+              disabled={!isOwner}
+              onChange={(v) => setDraft((d) => ({ ...d, smallBlind: v }))}
+            />
+            <SettingRow
+              label="Big Blind"
+              value={draft.bigBlind}
+              disabled={!isOwner}
+              onChange={(v) => setDraft((d) => ({ ...d, bigBlind: v }))}
+            />
+
+            {!isOwner && (
+              <p className="text-xs text-gray-600 text-center">Only the room owner can change settings.</p>
+            )}
+
+            {isOwner && (
               <button
-                onClick={() => setActiveTab('dev')}
-                className={`flex-1 px-4 py-2.5 text-sm font-medium transition-colors ${
-                  activeTab === 'dev'
-                    ? 'text-amber-400 border-b-2 border-amber-400 bg-[#1e1e1e]'
-                    : 'text-gray-500 hover:text-gray-300'
-                }`}
+                onClick={handleSave}
+                className="mt-1 w-full py-2 rounded-lg bg-violet-600 hover:bg-violet-500 text-white text-sm font-medium transition-colors"
               >
-                Dev
+                Save
               </button>
             )}
           </div>
-
-            <div className="p-4 flex flex-col gap-4">
-              <div className="flex items-center justify-between gap-4">
-                <button
-                  type="button"
-                  className={`relative w-10 h-6 rounded-full transition-colors focus:outline-none ${
-                  }`}
-                >
-                  <span
-                    className={`absolute top-1 w-4 h-4 rounded-full bg-white shadow transition-transform ${
-                    }`}
-                  />
-                </button>
-              </div>
-            </div>
-          )}
-
-          {/* Game Config Tab */}
-          {activeTab === 'game' && (
-            <div className="p-4 flex flex-col gap-4">
-              <SettingRow
-                label="Stake (buy-in)"
-                value={draft.stake}
-                disabled={!isOwner}
-                onChange={(v) => setDraft((d) => ({ ...d, stake: v }))}
-              />
-              <SettingRow
-                label="Small Blind"
-                value={draft.smallBlind}
-                disabled={!isOwner}
-                onChange={(v) => setDraft((d) => ({ ...d, smallBlind: v }))}
-              />
-              <SettingRow
-                label="Big Blind"
-                value={draft.bigBlind}
-                disabled={!isOwner}
-                onChange={(v) => setDraft((d) => ({ ...d, bigBlind: v }))}
-              />
-
-              {!isOwner && (
-                <p className="text-xs text-gray-600 text-center">Only the room owner can change settings.</p>
-              )}
-
-              {isOwner && (
-                <button
-                  onClick={handleSave}
-                  className="mt-1 w-full py-2 rounded-lg bg-violet-600 hover:bg-violet-500 text-white text-sm font-medium transition-colors"
-                >
-                  Save
-                </button>
-              )}
-            </div>
-          )}
         </div>
       )}
     </div>

@@ -106,11 +106,23 @@ export default function GameTable({ gameState, lobbyPlayers, myId, onAction }: G
               isCurrentTurn={hand ? hand.playerOrder[hand.currentPlayerIndex] === player?.id && !hand.isOver : false}
               handActive={!!hand && !hand.isOver}
               connected={(player as LobbyPlayer | undefined)?.connected}
+              handStatus={hand ? (hand.players[player?.id ?? ''] as { handStatus?: string } | undefined)?.handStatus : undefined}
             />
             {player && hand && <Card card={(player as PlayerView).card ?? null}/>}
           </div>
         );
       })}
+
+      {/* Pot display */}
+      {hand && hand.pot > 0 && (
+        <div
+          className="absolute -translate-x-1/2 -translate-y-1/2 text-center pointer-events-none"
+          style={{ left: '50%', top: '50%' }}
+        >
+          <div className="text-xs font-semibold uppercase tracking-widest text-gray-400">Pot</div>
+          <div className="text-xl font-black text-white tabular-nums">{hand.pot}</div>
+        </div>
+      )}
 
       {/* Winner reveal overlay */}
       {winnerInfo && (
