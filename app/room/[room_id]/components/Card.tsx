@@ -38,16 +38,12 @@ export default function Card({ card, size = 'md' }: CardProps) {
   const centerSize = { sm: 'text-xl', md: 'text-3xl', lg: 'text-4xl' }[size];
 
   return (
-    <div className={`${dims} rounded-lg bg-white flex flex-col justify-between p-1 shadow-md select-none`}>
+    <div className={`${dims} rounded-lg bg-white flex flex-col justify-start p-1 shadow-md select-none`}>
       <div className={`font-bold leading-none ${color}`}>
         <div>{card.rank}</div>
         <div className="text-xs">{symbol}</div>
       </div>
-      <div className={`${centerSize} text-center leading-none ${color}`}>{symbol}</div>
-      <div className={`font-bold leading-none self-end rotate-180 ${color}`}>
-        <div>{card.rank}</div>
-        <div className="text-xs">{symbol}</div>
-      </div>
+      <div className={`${centerSize} text-center leading-none ${color} mt-auto`}>{symbol}</div>
     </div>
   );
 }

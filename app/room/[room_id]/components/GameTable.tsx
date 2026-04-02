@@ -115,10 +115,12 @@ interface GameTableProps {
       {hand && hand.pot > 0 && (
         <div
           className="absolute -translate-x-1/2 -translate-y-1/2 text-center pointer-events-none"
-          style={{ left: '50%', top: '50%' }}
+          style={{ left: '50%', top: 'calc(50% + 50px)' }}
         >
-          <div className="text-xs font-semibold uppercase tracking-widest text-gray-400">Pot</div>
-          <div className="text-xl font-black text-white tabular-nums">{hand.pot}</div>
+          <div className="rounded-xl border border-violet-500/30 bg-[#0e0e1a]/80 px-4 py-2 shadow-[0_0_28px_rgba(139,92,246,0.45)]">
+            <div className="text-[10px] font-semibold uppercase tracking-widest text-violet-400/70">Pot</div>
+            <div className="text-xl font-black text-white tabular-nums">{hand.pot}</div>
+          </div>
         </div>
       )}
 
