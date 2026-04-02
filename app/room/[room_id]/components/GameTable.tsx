@@ -107,6 +107,10 @@ interface GameTableProps {
               connected={(player as LobbyPlayer | undefined)?.connected}
               handStatus={hand ? (hand.players[player?.id ?? ''] as { handStatus?: string } | undefined)?.handStatus : undefined}
             />
+            {player && hand && <Card card={
+                ? null
+                : (player as PlayerView).card ?? null
+            }/>}
           </div>
         );
       })}
