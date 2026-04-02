@@ -38,7 +38,6 @@ interface GameTableProps {
   onAction: (action: Action) => void;
 }
 
-export default function GameTable({ gameState, lobbyPlayers, myId, onAction }: GameTableProps) {
   const hand = gameState?.hand ?? null;
   const myStack = gameState?.myStack ?? 0;
   const winnerInfo = hand?.isOver && hand.winnerId
@@ -108,7 +107,6 @@ export default function GameTable({ gameState, lobbyPlayers, myId, onAction }: G
               connected={(player as LobbyPlayer | undefined)?.connected}
               handStatus={hand ? (hand.players[player?.id ?? ''] as { handStatus?: string } | undefined)?.handStatus : undefined}
             />
-            {player && hand && <Card card={(player as PlayerView).card ?? null}/>}
           </div>
         );
       })}
