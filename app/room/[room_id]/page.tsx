@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect, useRef } from "react";
-import { useParams, useSearchParams } from "next/navigation";
+import { useParams } from "next/navigation";
 import { io, Socket } from "socket.io-client";
 import SettingsDropdown from "./components/SettingsDropdown";
 import GameTable from "./components/GameTable";
@@ -26,7 +26,6 @@ type LobbyUpdate = {
 
 export default function RoomPage() {
   const { room_id: roomId } = useParams<{ room_id: string }>();
-  const searchParams = useSearchParams();
 
   const [pageState, setPageState] = useState<PageState>("join");
   const [joinName, setJoinName] = useState("");
@@ -57,6 +56,7 @@ export default function RoomPage() {
       const savedId = localStorage.getItem(`pid_${roomId}`);
       if (savedId) {
         setPlayerId(savedId);
+        socket.emit("join_room", { room_id: roomId, player_id: savedId, display_name: "" });
       }
     });
 
@@ -106,6 +106,7 @@ export default function RoomPage() {
     if (!trimmed || !socketRef.current) return;
     setJoining(true);
     setJoinError("");
+    socketRef.current.emit("join_room", { room_id: roomId, display_name: trimmed });
   }
 
   function handleWatch() {
@@ -113,6 +114,7 @@ export default function RoomPage() {
     if (!trimmed || !socketRef.current) return;
     setJoining(true);
     setJoinError("");
+    socketRef.current.emit("join_room", { room_id: roomId, display_name: trimmed, spectator: true });
   }
 
   function handleStartRound() {

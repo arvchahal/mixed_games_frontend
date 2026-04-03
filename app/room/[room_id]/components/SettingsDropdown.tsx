@@ -9,6 +9,7 @@ interface SettingsDropdownProps {
   onSave?: (updated: RoomSettings) => void;
 }
 
+export default function SettingsDropdown({ settings, isOwner, onSave }: SettingsDropdownProps) {
   const [open, setOpen] = useState(false);
   const [draft, setDraft] = useState<RoomSettings>(settings);
   const ref = useRef<HTMLDivElement>(null);
@@ -82,17 +83,6 @@ interface SettingsDropdownProps {
               </button>
             )}
 
-              <div className="border-t border-gray-700 pt-3 flex flex-col gap-2">
-                <p className="text-[10px] uppercase tracking-widest text-gray-600 font-semibold">Dev</p>
-                <div className="flex items-center justify-between gap-4">
-                  <button
-                  >
-                    <span
-                    />
-                  </button>
-                </div>
-              </div>
-            )}
           </div>
         </div>
       )}
